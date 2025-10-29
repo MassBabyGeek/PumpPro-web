@@ -25,9 +25,9 @@ export default function AdminLogin() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        body: JSON.stringify({ email, password }),
-        signal: controller.signal,
+        body: JSON.stringify({ email, password })
       });
 
       clearTimeout(timeoutId);
