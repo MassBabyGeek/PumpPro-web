@@ -39,10 +39,11 @@ export default function AdminLogin() {
 
       const data = await response.json();
 
+      console.log("data:", data.data.user);
       // Stocker le token et les infos utilisateur
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("refreshToken", data.refreshToken);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.data.token);
+      localStorage.setItem("refreshToken", data.data.refreshToken);
+      localStorage.setItem("user", JSON.stringify(data.data.user));
 
       // Rediriger vers le dashboard
       router.push("/admin/dashboard");
