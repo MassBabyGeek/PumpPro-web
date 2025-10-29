@@ -4,6 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+export const metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default function AdminLogin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -17,13 +24,20 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
+      // Créer un contrôleur d'abort pour gérer le timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 secondes
+
       const response = await fetch("https://pumppro-backend.onrender.com/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -40,7 +54,11 @@ export default function AdminLogin() {
       // Rediriger vers le dashboard
       router.push("/admin/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur de connexion");
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError("Le serveur met trop de temps à répondre. Il est probablement en veille (Render gratuit). Veuillez réessayer dans quelques secondes.");
+      } else {
+        setError(err instanceof Error ? err.message : "Erreur de connexion");
+      }
     } finally {
       setLoading(false);
     }
@@ -74,6 +92,10 @@ export default function AdminLogin() {
               {error}
             </div>
           )}
+
+          <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/50 rounded-lg text-blue-400 text-sm">
+            ℹ️ Le serveur backend (Render gratuit) peut mettre jusqu'à 60 secondes à se réveiller lors de la première connexion.
+          </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
@@ -111,7 +133,7 @@ export default function AdminLogin() {
               disabled={loading}
               className="w-full py-3 rounded-lg bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] text-white font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Connexion..." : "Se connecter"}
+              {loading ? "Connexion en cours... (peut prendre jusqu'à 60s)" : "Se connecter"}
             </button>
           </form>
 
