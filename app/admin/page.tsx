@@ -4,13 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export const metadata = {
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
-
 export default function AdminLogin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -94,7 +87,7 @@ export default function AdminLogin() {
           )}
 
           <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/50 rounded-lg text-blue-400 text-sm">
-            ℹ️ Le serveur backend (Render gratuit) peut mettre jusqu'à 60 secondes à se réveiller lors de la première connexion.
+            ℹ️ Le serveur backend (Render gratuit) peut mettre jusqu&apos;à 60 secondes à se réveiller lors de la première connexion.
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
