@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PompeurPro Admin
 
-## Getting Started
+Interface d'administration web pour l'application mobile PompeurPro.
 
-First, run the development server:
+## Description
+
+PompeurPro Admin est un site Next.js qui comprend :
+- **Landing page** : Présentation de l'application PompeurPro avec toutes ses fonctionnalités
+- **Espace Admin** : Interface de connexion et dashboard pour gérer l'application mobile
+
+## Technologies
+
+- **Framework** : Next.js 16 (App Router)
+- **Langage** : TypeScript
+- **Styling** : Tailwind CSS
+- **Backend** : API PumpPro (Go)
+
+## Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Créez un fichier `.env.local` à la racine du projet :
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_API_URL=https://pumppro-backend.onrender.com
+```
 
-## Learn More
+## Lancement
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Mode développement
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Build production
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Lancement production
+npm start
+```
 
-## Deploy on Vercel
+L'application sera accessible sur [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Structure du projet
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+pompeurpro-admin/
+├── app/
+│   ├── page.tsx              # Landing page
+│   ├── admin/
+│   │   ├── page.tsx          # Page de connexion admin
+│   │   └── dashboard/
+│   │       └── page.tsx      # Dashboard admin
+│   ├── layout.tsx
+│   └── globals.css
+├── lib/
+│   └── api.ts                # Service API
+├── types/
+│   └── api.ts                # Types TypeScript
+└── .env.local                # Configuration
+```
+
+## Fonctionnalités
+
+### Landing Page
+- Présentation de PompeurPro
+- Fonctionnalités principales (détection IA, statistiques, défis)
+- Thème sombre avec les couleurs de la marque
+- Lien vers l'espace admin
+
+### Espace Admin
+- Connexion sécurisée avec l'API backend
+- Dashboard avec statistiques
+- Gestion des utilisateurs (à venir)
+- Gestion des défis (à venir)
+- Statistiques détaillées (à venir)
+
+## API Backend
+
+Le projet utilise l'API PumpPro-backend :
+- **URL** : https://pumppro-backend.onrender.com
+- **Auth** : JWT (Access Token + Refresh Token)
+- **Endpoints utilisés** :
+  - `POST /auth/login` : Connexion
+  - `POST /auth/logout` : Déconnexion
+  - `POST /auth/refresh` : Renouvellement du token
+
+## Thème et Design
+
+Le projet reprend le thème de l'application mobile :
+- **Primary** : #00BFFF (Cyan)
+- **Accent** : #8E2DE2 (Purple)
+- **Background** : #1B1F3B / #2C2F38
+- **Text** : #F4F4F4 / #B0B3B8
+
+## Projets liés
+
+- **Mobile App** : `~/Documents/repositories/personnel/pompeurpro`
+- **Backend** : `~/Documents/repositories/personnel/PumpPro-backend`
+
+## Développement futur
+
+- [ ] Gestion complète des utilisateurs
+- [ ] Création et gestion des défis
+- [ ] Statistiques détaillées avec graphiques
+- [ ] Gestion des programmes d'entraînement
+- [ ] Système de notifications
+- [ ] Modération du contenu
