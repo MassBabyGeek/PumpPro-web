@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 interface User {
   id: string;
@@ -19,17 +18,24 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Vérifier l'authentification
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
 
-    if (!token || !userData) {
+    if (!token || !userData || userData === "undefined") {
       router.push("/admin");
       return;
     }
 
-    setUser(JSON.parse(userData));
-    setLoading(false);
+    setTimeout(() => {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        setLoading(false);
+      } catch (err) {
+        console.error("Erreur lors du parsing du user:", err);
+        router.push("/admin");
+      }
+    }, 0);
   }, [router]);
 
   const handleLogout = async () => {
