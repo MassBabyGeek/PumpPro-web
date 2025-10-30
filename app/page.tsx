@@ -3,6 +3,34 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1B1F3B] via-[#2C2F38] to-[#1B1F3B]">
+      {/* Header */}
+      <header className="fixed top-0 w-full bg-[#1B1F3B]/80 backdrop-blur-sm z-50 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="text-4xl">💪</div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] bg-clip-text text-transparent">
+              PompeurPro
+            </h1>
+          </div>
+          <div className="flex gap-4 items-center">
+            <a
+              href="#faq"
+              className="px-4 py-2 text-[#F4F4F4] hover:text-[#00BFFF] transition-colors"
+            >
+              FAQ
+            </a>
+            <a
+              href="https://apps.apple.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-2 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] text-white font-semibold hover:opacity-90 transition-opacity text-sm"
+            >
+              Télécharger
+            </a>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <main className="pt-24">
         <section className="max-w-7xl mx-auto px-6 py-20 text-center">
