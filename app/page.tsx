@@ -478,35 +478,42 @@ export default function Home() {
         {/* CTA Section */}
         <section className="max-w-7xl mx-auto px-6 py-20">
           <div className="bg-gradient-to-r from-[#00BFFF]/20 to-[#8E2DE2]/20 rounded-3xl p-12 md:p-16 border border-white/10 text-center">
+            <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] text-white font-semibold text-sm mb-6">
+              🎉 VERSION BETA - 100% GRATUITE
+            </div>
             <h3 className="text-4xl md:text-5xl font-bold text-[#F4F4F4] mb-6">
               Prêt à transformer ton corps ? 🚀
             </h3>
             <p className="text-xl text-[#B0B3B8] mb-8 max-w-2xl mx-auto">
-              Rejoins plus de 10 000 athlètes qui transforment déjà leur corps avec PompeurPro. Essai gratuit 7 jours, sans carte bancaire.
+              Rejoins plus de 10 000 athlètes qui transforment déjà leur corps avec PompeurPro. Télécharge l&apos;app gratuitement et commence ton entraînement !
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
               <a
-                href="#tarifs"
+                href="https://apps.apple.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-10 py-4 rounded-2xl bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] text-white font-bold text-lg hover:opacity-90 transition-opacity shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all"
               >
-                Commencer maintenant
+                📱 Télécharger sur iOS
               </a>
               <a
-                href="#demo"
+                href="https://play.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-10 py-4 rounded-2xl bg-white/10 backdrop-blur-sm text-[#F4F4F4] font-semibold hover:bg-white/20 transition-colors"
               >
-                Regarder la démo
+                📱 Télécharger sur Android
               </a>
             </div>
             <div className="flex flex-wrap justify-center gap-6 text-sm text-[#B0B3B8]">
               <span className="flex items-center gap-2">
-                ✓ Essai gratuit 7 jours
+                ✓ 100% Gratuit
               </span>
               <span className="flex items-center gap-2">
-                ✓ Sans carte bancaire
+                ✓ Toutes les fonctionnalités
               </span>
               <span className="flex items-center gap-2">
-                ✓ Annulation en 1 clic
+                ✓ Sans publicité
               </span>
               <span className="flex items-center gap-2">
                 ✓ iOS & Android
@@ -538,9 +545,9 @@ export default function Home() {
               <h4 className="text-[#F4F4F4] font-semibold mb-4">Produit</h4>
               <ul className="space-y-2 text-sm text-[#B0B3B8]">
                 <li><a href="#" className="hover:text-[#00BFFF] transition-colors">Fonctionnalités</a></li>
-                <li><a href="#tarifs" className="hover:text-[#00BFFF] transition-colors">Tarifs</a></li>
                 <li><a href="#faq" className="hover:text-[#00BFFF] transition-colors">FAQ</a></li>
-                <li><a href="#" className="hover:text-[#00BFFF] transition-colors">Télécharger</a></li>
+                <li><a href="https://apps.apple.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#00BFFF] transition-colors">Télécharger iOS</a></li>
+                <li><a href="https://play.google.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#00BFFF] transition-colors">Télécharger Android</a></li>
               </ul>
             </div>
 
