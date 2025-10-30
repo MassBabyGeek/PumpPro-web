@@ -33,8 +33,13 @@ export default function UserProfilePage() {
           api.getUserChallenges(userId, token),
         ]);
 
-        setUser(userData);
-        setStats(statsData);
+        console.log("userData:", userData);
+        console.log("statsData:", statsData);
+        console.log("workoutsData:", workoutsData);
+        console.log("challengesData:", challengesData);
+
+        setUser(userData!.data as any);
+        setStats(statsData!.data as any);
         setWorkouts(Array.isArray(workoutsData) ? workoutsData : (workoutsData as any)?.data || []);
         setChallenges(Array.isArray(challengesData) ? challengesData : (challengesData as any)?.data || []);
       } catch (error) {
