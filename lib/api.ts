@@ -1,6 +1,32 @@
 import type { LoginRequest, LoginResponse } from "@/types/api";
+import type {
+  UserProfile,
+  Challenge,
+  WorkoutProgram,
+  WorkoutSession,
+  LeaderboardEntry,
+  Stats,
+  Photo,
+  AuthResponse,
+  AdminDashboardStats,
+  AdminActivity,
+  SystemHealth,
+  TopContent,
+  AnalyticsData,
+  PaginationParams,
+  PaginatedResponse,
+  AdminUserListItem,
+} from "@/types/models";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://pumppro-backend.onrender.com";
+
+// Backend response wrapper
+interface APIResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
 
 class ApiService {
   private getStoredToken(): string | null {
@@ -36,31 +62,51 @@ class ApiService {
     }
 
     try {
+      console.log(`[API] ${options?.method || 'GET'} ${url}`);
+
       const response = await fetch(url, {
         ...options,
         headers,
-        mode: "cors", // Explicitement activer CORS
-        credentials: "omit", // Ne pas envoyer de credentials par défaut
+        mode: "cors",
+        credentials: "omit",
       });
 
+      console.log(`[API] Response ${response.status}:`, response.statusText);
+
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: "Erreur réseau" }));
+        const error = await response.json().catch(() => ({ error: "Erreur réseau" })) as APIResponse;
+        console.error(`[API] Error ${response.status}:`, error);
         throw new Error(error.error || `Erreur ${response.status}`);
       }
 
-      const data = await response.json();
+      const result = await response.json() as APIResponse<T>;
+      console.log(`[API] Success:`, result);
 
-      // Auto-unwrap .data si présent
-      return (data?.data !== undefined ? data.data : data) as T;
+      // Le backend envoie { success: true, data: {...} }
+      // On retourne data directement
+      if (result.success && result.data !== undefined) {
+        return result.data;
+      }
+
+      // Si pas de wrapper, retourner tel quel
+      return result as unknown as T;
     } catch (error) {
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        console.error('[API] CORS ou connexion réseau échouée:', {
+          url,
+          method: options?.method || 'GET',
+          error: error.message
+        });
+        throw new Error('Impossible de se connecter au serveur. Vérifiez votre connexion ou les paramètres CORS.');
+      }
       console.error("API Error:", error);
       throw error;
     }
   }
 
   // Authentication
-  async login(credentials: LoginRequest): Promise<LoginResponse> {
-    return this.request<LoginResponse>("/auth/login", {
+  async login(credentials: LoginRequest): Promise<AuthResponse> {
+    return this.request<AuthResponse>("/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
@@ -72,181 +118,259 @@ class ApiService {
     });
   }
 
-  async refreshToken(refreshToken: string): Promise<LoginResponse> {
-    return this.request<LoginResponse>("/auth/refresh", {
+  async refreshToken(refreshToken: string): Promise<AuthResponse> {
+    return this.request<AuthResponse>("/auth/refresh", {
       method: "POST",
       body: JSON.stringify({ refreshToken }),
     });
   }
 
   // Users
-  async getUsers() {
-    return this.request("/users");
+  async getUsers(): Promise<UserProfile[]> {
+    return this.request<UserProfile[]>("/users");
   }
 
-  async getUser(userId: string) {
-    return this.request(`/users/${userId}`);
+  async getUser(userId: string): Promise<UserProfile> {
+    return this.request<UserProfile>(`/users/${userId}`);
   }
 
-  async createUser(data: unknown) {
-    return this.request("/users", {
+  async createUser(data: Partial<UserProfile>): Promise<UserProfile> {
+    return this.request<UserProfile>("/users", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  async updateUser(userId: string, data: unknown) {
-    return this.request(`/users/${userId}`, {
+  async updateUser(userId: string, data: Partial<UserProfile>): Promise<UserProfile> {
+    return this.request<UserProfile>(`/users/${userId}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
-  async deleteUser(userId: string) {
-    return this.request(`/users/${userId}`, {
+  async deleteUser(userId: string): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>(`/users/${userId}`, {
       method: "DELETE",
     });
   }
 
-  async getUserStats(userId: string, period: string) {
-    return this.request(`/users/${userId}/stats/${period}`);
+  async getUserStats(userId: string, period: string): Promise<Stats> {
+    return this.request<Stats>(`/users/${userId}/stats/${period}`);
   }
 
-  async getUserCharts(userId: string, period: string) {
+  async getUserCharts(userId: string, period: string): Promise<any> {
     return this.request(`/users/${userId}/charts/${period}`);
   }
 
-  async getUserWorkouts(userId: string) {
-    return this.request(`/users/${userId}/workouts`);
+  async getUserWorkouts(userId: string): Promise<WorkoutSession[]> {
+    return this.request<WorkoutSession[]>(`/users/${userId}/workouts`);
   }
 
-  async getUserChallenges(userId: string) {
-    return this.request(`/users/${userId}/challenges`);
+  async getUserChallenges(userId: string): Promise<Challenge[]> {
+    return this.request<Challenge[]>(`/users/${userId}/challenges`);
   }
 
   // Challenges
-  async getChallenges() {
-    return this.request("/challenges");
+  async getChallenges(): Promise<Challenge[]> {
+    return this.request<Challenge[]>("/challenges");
   }
 
-  async getChallenge(id: string) {
-    return this.request(`/challenges/${id}`);
+  async getChallenge(id: string): Promise<Challenge> {
+    return this.request<Challenge>(`/challenges/${id}`);
   }
 
-  async createChallenge(data: unknown) {
-    return this.request("/challenges", {
+  async createChallenge(data: Partial<Challenge>): Promise<Challenge> {
+    return this.request<Challenge>("/challenges", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  async updateChallenge(id: string, data: unknown) {
-    return this.request(`/challenges/${id}`, {
+  async updateChallenge(id: string, data: Partial<Challenge>): Promise<Challenge> {
+    return this.request<Challenge>(`/challenges/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
-  async deleteChallenge(id: string) {
-    return this.request(`/challenges/${id}`, {
+  async deleteChallenge(id: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/challenges/${id}`, {
       method: "DELETE",
+      body: JSON.stringify({ deletedBy: "admin" }),
     });
   }
 
-  async getChallengeLeaderboard(challengeId: string) {
-    return this.request(`/challenges/${challengeId}/leaderboard`);
+  async getChallengeLeaderboard(challengeId: string): Promise<LeaderboardEntry[]> {
+    return this.request<LeaderboardEntry[]>(`/challenges/${challengeId}/leaderboard`);
   }
 
   // Programs
-  async getPrograms() {
-    return this.request("/programs");
+  async getPrograms(): Promise<WorkoutProgram[]> {
+    return this.request<WorkoutProgram[]>("/programs");
   }
 
-  async getProgram(id: string) {
-    return this.request(`/programs/${id}`);
+  async getProgram(id: string): Promise<WorkoutProgram> {
+    return this.request<WorkoutProgram>(`/programs/${id}`);
   }
 
-  async createProgram(data: unknown) {
-    return this.request("/programs", {
+  async createProgram(data: Partial<WorkoutProgram>): Promise<WorkoutProgram> {
+    return this.request<WorkoutProgram>("/programs", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  async updateProgram(id: string, data: unknown) {
-    return this.request(`/programs/${id}`, {
+  async updateProgram(id: string, data: Partial<WorkoutProgram>): Promise<WorkoutProgram> {
+    return this.request<WorkoutProgram>(`/programs/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
-  async deleteProgram(id: string) {
-    return this.request(`/programs/${id}`, {
+  async deleteProgram(id: string): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>(`/programs/${id}`, {
       method: "DELETE",
+      body: JSON.stringify({ deletedBy: "admin" }),
     });
   }
 
-  async getFeaturedPrograms() {
-    return this.request("/programs/featured");
+  async getFeaturedPrograms(): Promise<WorkoutProgram[]> {
+    return this.request<WorkoutProgram[]>("/programs/featured");
   }
 
-  async getPopularPrograms() {
-    return this.request("/programs/popular");
+  async getPopularPrograms(): Promise<WorkoutProgram[]> {
+    return this.request<WorkoutProgram[]>("/programs/popular");
   }
 
   // Workouts
-  async getWorkouts() {
-    return this.request("/workouts");
+  async getWorkouts(): Promise<WorkoutSession[]> {
+    return this.request<WorkoutSession[]>("/workouts");
   }
 
-  async getWorkout(id: string) {
-    return this.request(`/workouts/${id}`);
+  async getWorkout(id: string): Promise<WorkoutSession> {
+    return this.request<WorkoutSession>(`/workouts/${id}`);
   }
 
-  async createWorkout(data: unknown) {
-    return this.request("/workouts", {
+  async createWorkout(data: Partial<WorkoutSession>): Promise<WorkoutSession> {
+    return this.request<WorkoutSession>("/workouts", {
       method: "POST",
       body: JSON.stringify(data),
     });
   }
 
-  async updateWorkout(id: string, data: unknown) {
-    return this.request(`/workouts/${id}`, {
+  async updateWorkout(id: string, data: Partial<WorkoutSession>): Promise<WorkoutSession> {
+    return this.request<WorkoutSession>(`/workouts/${id}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     });
   }
 
-  async deleteWorkout(id: string) {
-    return this.request(`/workouts/${id}`, {
+  async deleteWorkout(id: string): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>(`/workouts/${id}`, {
       method: "DELETE",
     });
   }
 
   // Leaderboard
-  async getLeaderboard(period?: string, limit?: number) {
+  async getLeaderboard(period?: string, limit?: number): Promise<LeaderboardEntry[]> {
     const params = new URLSearchParams();
     if (period) params.append("period", period);
     if (limit) params.append("limit", limit.toString());
     const query = params.toString();
-    return this.request(`/leaderboard${query ? `?${query}` : ""}`);
+    return this.request<LeaderboardEntry[]>(`/leaderboard${query ? `?${query}` : ""}`);
   }
 
-  async getLeaderboardTop(period?: string) {
+  async getLeaderboardTop(period?: string): Promise<LeaderboardEntry[]> {
     const params = new URLSearchParams();
     if (period) params.append("period", period);
     const query = params.toString();
-    return this.request(`/leaderboard/top${query ? `?${query}` : ""}`);
+    return this.request<LeaderboardEntry[]>(`/leaderboard/top${query ? `?${query}` : ""}`);
   }
 
-  // Photos
-  async getPhotos() {
-    return this.request("/admin/photos");
+  // Admin - Dashboard
+  async getAdminDashboard(): Promise<AdminDashboardStats> {
+    return this.request<AdminDashboardStats>("/admin/dashboard");
+  }
+
+  // Admin - Activity
+  async getAdminActivity(params?: { limit?: number }): Promise<AdminActivity[]> {
+    const queryParams = new URLSearchParams();
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    const query = queryParams.toString();
+    return this.request<AdminActivity[]>(`/admin/activity${query ? `?${query}` : ""}`);
+  }
+
+  // Admin - System Health
+  async getAdminHealth(): Promise<SystemHealth> {
+    return this.request<SystemHealth>("/admin/health");
+  }
+
+  // Admin - Top Content
+  async getAdminTopContent(): Promise<TopContent> {
+    return this.request<TopContent>("/admin/top-content");
+  }
+
+  // Admin - Analytics
+  async getAdminAnalytics(params?: { period?: "7d" | "30d" | "90d" | "1y" }): Promise<AnalyticsData> {
+    const queryParams = new URLSearchParams();
+    if (params?.period) queryParams.append("period", params.period);
+    const query = queryParams.toString();
+    return this.request<AnalyticsData>(`/admin/analytics${query ? `?${query}` : ""}`);
+  }
+
+  // Admin - Users Management
+  async getAdminUsers(params?: PaginationParams): Promise<PaginatedResponse<AdminUserListItem>> {
+    const queryParams = new URLSearchParams();
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.offset) queryParams.append("offset", params.offset.toString());
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.sort) queryParams.append("sort", params.sort);
+    const query = queryParams.toString();
+    return this.request<PaginatedResponse<AdminUserListItem>>(`/admin/users${query ? `?${query}` : ""}`);
+  }
+
+  // Admin - User Actions
+  async promoteUserToAdmin(userId: string): Promise<{ success: boolean; user: UserProfile }> {
+    return this.request<{ success: boolean; user: UserProfile }>(`/admin/users/${userId}/promote`, {
+      method: "POST",
+    });
+  }
+
+  async demoteUserFromAdmin(userId: string): Promise<{ success: boolean; user: UserProfile }> {
+    return this.request<{ success: boolean; user: UserProfile }>(`/admin/users/${userId}/demote`, {
+      method: "POST",
+    });
+  }
+
+  async deleteAdminUser(userId: string): Promise<{ success: boolean; message: string }> {
+    return this.request<{ success: boolean; message: string }>(`/admin/users/${userId}`, {
+      method: "DELETE",
+    });
+  }
+
+  // Admin - Photos Management
+  async getAdminPhotos(params?: {
+    type?: "all" | "avatar" | "challenge" | "bug_report";
+    limit?: number;
+    offset?: number;
+  }): Promise<PaginatedResponse<Photo>> {
+    const queryParams = new URLSearchParams();
+    if (params?.type) queryParams.append("type", params.type);
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.offset) queryParams.append("offset", params.offset.toString());
+    const query = queryParams.toString();
+    return this.request<PaginatedResponse<Photo>>(`/admin/photos${query ? `?${query}` : ""}`);
+  }
+
+  // Legacy Photos endpoint (for backward compatibility)
+  async getPhotos(): Promise<Photo[]> {
+    const result = await this.getAdminPhotos();
+    return result.data;
   }
 
   // Health
-  async healthCheck() {
-    return this.request("/health");
+  async healthCheck(): Promise<{ status: string }> {
+    return this.request<{ status: string }>("/health");
   }
 }
 

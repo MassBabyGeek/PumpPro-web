@@ -5,6 +5,7 @@ import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useWorkouts } from "@/hooks/useAPI";
 import { api } from "@/lib/api";
+import { UserCreator, WorkoutSession } from "@/types/models";
 
 export default function WorkoutsPage() {
   const { workouts, loading, refetch } = useWorkouts();
@@ -36,7 +37,7 @@ export default function WorkoutsPage() {
                 <thead className="bg-[#1B1F3B]">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-[#B0B3B8] uppercase">Utilisateur</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-[#B0B3B8] uppercase">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-[#B0B3B8] uppercase">Complété</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-[#B0B3B8] uppercase">Repetitions</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-[#B0B3B8] uppercase">Duree</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-[#B0B3B8] uppercase">Date</th>
@@ -45,19 +46,19 @@ export default function WorkoutsPage() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {Array.isArray(workouts) && workouts.length > 0 ? (
-                    (workouts as Array<Record<string, any>>).map((item) => {
-                      const workoutId = item.sessionId || item.id;
-                      const user = item.user || item.creator;
-                      const userId = user?.id || user?.userId;
+                    (workouts as Array<WorkoutSession>).map((workoutSession) => {
+                      const workoutId = workoutSession.sessionId
+                      const user = workoutSession.user as unknown as UserCreator;
+                      const userId = user?.id;
                       return (
                         <tr key={workoutId} className="hover:bg-[#1B1F3B]/50">
                           <td className="px-4 py-3">
                             {userId ? (
                               <Link href={`/admin/dashboard/users/${userId}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                                {user?.profilePicture || user?.profilePictureUrl || user?.avatar ? (
+                                {user?.avatar ? (
                                   <Image
-                                    src={String(user.profilePicture || user.profilePictureUrl || user.avatar)}
-                                    alt={String(user.name || user.email || "User")}
+                                    src={String(user.avatar)}
+                                    alt={String(user.name ||  "User")}
                                     width={32}
                                     height={32}
                                     className="w-8 h-8 rounded-full object-cover border border-white/10"
@@ -69,11 +70,8 @@ export default function WorkoutsPage() {
                                 )}
                                 <div className="flex-1 min-w-0">
                                   <p className="text-[#F4F4F4] text-sm font-medium truncate">
-                                    {user?.name || user?.email || "Utilisateur inconnu"}
+                                    {user?.name || "Utilisateur inconnu"}
                                   </p>
-                                  {user?.email && (
-                                    <p className="text-[#B0B3B8] text-xs truncate">{user.email}</p>
-                                  )}
                                 </div>
                               </Link>
                             ) : (
@@ -89,15 +87,15 @@ export default function WorkoutsPage() {
                               </div>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-sm text-[#F4F4F4]">{item.type || "Standard"}</td>
+                          <td className="px-4 py-3 text-sm text-[#F4F4F4]">{workoutSession.completed ? "Terminé" : "Abandonné"}</td>
                           <td className="px-4 py-3 text-sm text-[#00BFFF] font-semibold">
-                            {item.totalReps || item.reps || item.count || "0"}
+                            {workoutSession.totalReps ||  "0"}
                           </td>
                           <td className="px-4 py-3 text-sm text-[#B0B3B8]">
-                            {item.totalDuration ? `${Math.floor(item.totalDuration / 60)}min ${item.totalDuration % 60}s` : "N/A"}
+                            {workoutSession.totalDuration ? `${Math.floor(workoutSession.totalDuration / 60)}min ${workoutSession.totalDuration % 60}s` : "N/A"}
                           </td>
                           <td className="px-4 py-3 text-sm text-[#B0B3B8]">
-                            {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "N/A"}
+                            {workoutSession.createdAt ? new Date(workoutSession.createdAt).toLocaleDateString() : "N/A"}
                           </td>
                           <td className="px-4 py-3 text-sm text-right">
                             <button
