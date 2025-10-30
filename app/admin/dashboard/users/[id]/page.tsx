@@ -26,22 +26,48 @@ export default function UserProfilePage() {
     const fetchUserData = async () => {
       setLoading(true);
       try {
-        const [userData, statsData, workoutsData, challengesData] = await Promise.all([
+         const results = await Promise.allSettled([
           api.getUser(userId, token),
           api.getUserStats(userId, period, token),
           api.getUserWorkouts(userId, token),
           api.getUserChallenges(userId, token),
         ]);
+        const [userRes, statsRes, workoutsRes, challengesRes] = results;
 
-        console.log("userData:", userData);
-        console.log("statsData:", statsData);
-        console.log("workoutsData:", workoutsData);
-        console.log("challengesData:", challengesData);
+        if (userRes.status === "fulfilled") {
+          const data = (userRes.value as any)?.data ?? userRes.value;
+          setUser(data);
+        } else {
+          console.error("Erreur utilisateur:", userRes.reason);
+          alert("⚠️ Impossible de charger les informations utilisateur");
+        }
 
-        setUser((userData as any)?.data);
-        setStats((statsData as any)?.data);
-        setWorkouts(Array.isArray(workoutsData) ? workoutsData : (workoutsData as any)?.data || []);
-        setChallenges(Array.isArray(challengesData) ? challengesData : (challengesData as any)?.data || []);
+        // 🔹 STATS
+        if (statsRes.status === "fulfilled") {
+          const data = (statsRes.value as any)?.data ?? statsRes.value;
+          setStats(data);
+        } else {
+          console.error("Erreur stats:", statsRes.reason);
+          alert("⚠️ Impossible de charger les statistiques");
+        }
+
+        // 🔹 WORKOUTS
+        if (workoutsRes.status === "fulfilled") {
+          const data = (workoutsRes.value as any)?.data ?? workoutsRes.value;
+          setWorkouts(Array.isArray(data) ? data : []);
+        } else {
+          console.error("Erreur workouts:", workoutsRes.reason);
+          alert("⚠️ Impossible de charger les entraînements");
+        }
+
+        // 🔹 CHALLENGES
+        if (challengesRes.status === "fulfilled") {
+          const data = (challengesRes.value as any)?.data ?? challengesRes.value;
+          setChallenges(Array.isArray(data) ? data : []);
+        } else {
+          console.error("Erreur challenges:", challengesRes.reason);
+          alert("⚠️ Impossible de charger les challenges");
+        }
       } catch (error) {
         console.error("Erreur:", error);
         alert("Erreur lors du chargement du profil");
