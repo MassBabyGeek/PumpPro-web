@@ -38,8 +38,8 @@ export default function UserProfilePage() {
         console.log("workoutsData:", workoutsData);
         console.log("challengesData:", challengesData);
 
-        setUser(userData!.data as any);
-        setStats(statsData!.data as any);
+        setUser((userData as any)?.data);
+        setStats((statsData as any)?.data);
         setWorkouts(Array.isArray(workoutsData) ? workoutsData : (workoutsData as any)?.data || []);
         setChallenges(Array.isArray(challengesData) ? challengesData : (challengesData as any)?.data || []);
       } catch (error) {
