@@ -3,33 +3,45 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1B1F3B] via-[#2C2F38] to-[#1B1F3B]">
-      {/* Header */}
-      <header className="fixed top-0 w-full bg-[#1B1F3B]/80 backdrop-blur-sm z-50 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="text-4xl">💪</div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] bg-clip-text text-transparent">
-              PompeurPro
-            </h1>
-          </div>
-          <div className="flex gap-4 items-center">
-            <a
-              href="#faq"
-              className="px-4 py-2 text-[#F4F4F4] hover:text-[#00BFFF] transition-colors"
-            >
-              FAQ
-            </a>
-            <a
-              href="https://apps.apple.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] text-white font-semibold hover:opacity-90 transition-opacity text-sm"
-            >
-              Télécharger
-            </a>
-          </div>
-        </div>
-      </header>
+      <Head>
+        {/* --- SEO de base --- */}
+        <title>PompeurPro 💪 | Transforme ton corps une pompe à la fois</title>
+        <meta
+          name="description"
+          content="PompeurPro transforme ton smartphone en coach personnel grâce à l’IA. Compte tes pompes, suis ta progression et rejoins +10 000 athlètes !"
+        />
+        <meta name="keywords" content="fitness, pompes, IA, sport, coach, entrainement, musculation, pushups, PompeurPro" />
+        <meta name="author" content="PompeurPro" />
+        <meta name="robots" content="index, follow" />
+
+        {/* --- Open Graph (Facebook / LinkedIn / Discord / iMessage) --- */}
+        <meta property="og:title" content="PompeurPro 💪 | Transforme ton corps une pompe à la fois" />
+        <meta
+          property="og:description"
+          content="Grâce à l’IA, PompeurPro compte tes pompes automatiquement et suit ta progression. Rejoins +10 000 athlètes !"
+        />
+        <meta property="og:url" content="https://pompeurpro.com" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="PompeurPro" />
+        <meta property="og:locale" content="fr_FR" />
+        <meta property="og:image" content="https://pompeurpro.com/preview.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+
+        {/* --- Twitter Card (pour X / WhatsApp / Telegram) --- */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="PompeurPro 💪 | Transforme ton corps une pompe à la fois" />
+        <meta
+          name="twitter:description"
+          content="L'app fitness qui compte tes pompes automatiquement grâce à l'IA. Rejoins +10 000 athlètes !"
+        />
+        <meta name="twitter:image" content="https://pompeurpro.com/preview.jpg" />
+        <meta name="twitter:creator" content="@pompeurpro" />
+
+        {/* --- Favicon --- */}
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
 
       {/* Hero Section */}
       <main className="pt-24">

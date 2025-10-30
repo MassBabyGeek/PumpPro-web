@@ -1,0 +1,21 @@
+{
+  "name": "PompeurPro",
+  "short_name": "PompeurPro",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1B1F3B",
+  "theme_color": "#00BFFF",
+  "description": "PompeurPro transforme ton smartphone en coach personnel grâce à l’IA. Compte tes pompes, suis ta progression et rejoins une communauté motivée.",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
