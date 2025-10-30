@@ -103,8 +103,8 @@ export default function AdminDashboard() {
                     href={`/admin/dashboard/users/${user.id}`}
                     className="flex items-center gap-3 p-2 bg-[#1B1F3B]/50 rounded-lg hover:bg-[#1B1F3B] transition-colors cursor-pointer"
                   >
-                    {user.profilePicture || user.profilePictureUrl ? (
-                      <Image src={String(user.profilePicture || user.profilePictureUrl)} alt={String(user.name || user.email)} width={32} height={32} className="w-8 h-8 rounded-full object-cover border border-white/10" />
+                    {user.profilePicture || user.profilePictureUrl || user.avatar ? (
+                      <Image src={String(user.profilePicture || user.profilePictureUrl || user.avatar)} alt={String(user.name || user.email)} width={32} height={32} className="w-8 h-8 rounded-full object-cover border border-white/10" />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-xs font-semibold">
                         {String(user.name || "?").charAt(0).toUpperCase()}

@@ -55,9 +55,9 @@ export default function WorkoutsPage() {
                           <td className="px-4 py-3">
                             {userId ? (
                               <Link href={`/admin/dashboard/users/${userId}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                                {user?.profilePicture || user?.profilePictureUrl ? (
+                                {user?.profilePicture || user?.profilePictureUrl || user?.avatar ? (
                                   <Image
-                                    src={String(user.profilePicture || user.profilePictureUrl)}
+                                    src={String(user.profilePicture || user.profilePictureUrl || user.avatar)}
                                     alt={String(user.name || user.email || "User")}
                                     width={32}
                                     height={32}

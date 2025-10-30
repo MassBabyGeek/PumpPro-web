@@ -120,9 +120,9 @@ export default function UserProfilePage() {
           </button>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              {user.profilePicture || user.profilePictureUrl ? (
+              {user.avatar || user.profilePicture || user.profilePictureUrl || user.avatar ? (
                 <Image
-                  src={String(user.profilePicture || user.profilePictureUrl)}
+                  src={String(user.profilePicture || user.profilePictureUrl || user.avatar)}
                   alt={user.name}
                   width={80}
                   height={80}

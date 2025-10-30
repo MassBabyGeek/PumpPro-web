@@ -95,8 +95,8 @@ export default function UsersPage() {
                       <tr key={user.id} className="hover:bg-[#1B1F3B]/50 transition-colors">
                         <td className="px-4 py-3">
                           <Link href={`/admin/dashboard/users/${user.id}`} className="block">
-                            {user.profilePicture || user.profilePictureUrl ? (
-                              <Image src={String(user.profilePicture || user.profilePictureUrl)} alt={String(user.name || user.email)} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-white/10 hover:border-[#00BFFF] transition-colors" />
+                            {user.profilePicture || user.profilePictureUrl || user.avatar ? (
+                              <Image src={String(user.profilePicture || user.profilePictureUrl || user.avatar)} alt={String(user.name || user.email)} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-white/10 hover:border-[#00BFFF] transition-colors" />
                             ) : (
                               <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-sm font-semibold hover:opacity-80 transition-opacity">
                                 {String(user.name || "?").charAt(0).toUpperCase()}

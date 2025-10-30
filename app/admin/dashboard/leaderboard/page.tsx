@@ -38,8 +38,8 @@ export default function LeaderboardPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-12 text-center font-bold text-[#F4F4F4]">#{index + 1}</div>
-                      {item.profilePicture || item.profilePictureUrl ? (
-                        <Image src={String(item.profilePicture || item.profilePictureUrl)} alt={String(item.name || item.username)} width={48} height={48} className="w-12 h-12 rounded-full object-cover border-2 border-white/10" />
+                      {item.profilePicture || item.profilePictureUrl || item.avatar ? (
+                        <Image src={String(item.profilePicture || item.profilePictureUrl || item.avatar)} alt={String(item.name || item.username)} width={48} height={48} className="w-12 h-12 rounded-full object-cover border-2 border-white/10" />
                       ) : (
                         <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white font-bold">{String(item.name || "?").charAt(0).toUpperCase()}</div>
                       )}

@@ -48,7 +48,7 @@ export default function PhotosPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {photos.map((photo, index) => {
               const userId = photo.userId || photo.user?.id;
-              const photoUrl = photo.url || photo.photoUrl || photo.profilePicture || photo.profilePictureUrl;
+              const photoUrl = photo.url || photo.photoUrl || photo.profilePicture || photo.profilePictureUrl || photo.avatar;
               const userName = photo.user?.name || photo.userName || photo.name;
               const userEmail = photo.user?.email || photo.userEmail || photo.email;
 
