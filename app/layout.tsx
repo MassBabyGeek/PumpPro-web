@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     siteName: "PompeurPro",
     images: [
       {
-        url: "/preview.png",
+        url: "https://pump-pro-web.vercel.app/preview.png",
         width: 1200,
         height: 630,
         alt: "PompeurPro - Application de comptage de pompes",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: "PompeurPro - Compte tes pompes automatiquement avec l'IA",
     description:
       "Transforme ton smartphone en coach personnel. Essai gratuit 7 jours !",
-    images: ["/preview.png"],
+    images: ["https://pump-pro-web.vercel.app/preview.png"],
     creator: "@pompeurpro",
   },
   robots: {
