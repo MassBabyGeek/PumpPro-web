@@ -30,24 +30,15 @@ export function useAuth() {
 }
 
 export function useUsers() {
-  const { token } = useAuth();
   const [users, setUsers] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchUsers = async () => {
-    if (!token) return;
     try {
       setLoading(true);
-      const response = await api.getUsers(token) as { success?: boolean; data?: unknown[] };
-      // Handle backend response format
-      if (response && typeof response === 'object' && 'data' in response) {
-        setUsers(Array.isArray(response.data) ? response.data : []);
-      } else if (Array.isArray(response)) {
-        setUsers(response);
-      } else {
-        setUsers([]);
-      }
+      const data = await api.getUsers();
+      setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
       setUsers([]);
@@ -58,29 +49,21 @@ export function useUsers() {
 
   useEffect(() => {
     fetchUsers();
-  }, [token]);
+  }, []);
 
   return { users, loading, error, refetch: fetchUsers };
 }
 
 export function useChallenges() {
-  const { token } = useAuth();
   const [challenges, setChallenges] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchChallenges = async () => {
-    if (!token) return;
     try {
       setLoading(true);
-      const response = await api.getChallenges(token) as { success?: boolean; data?: unknown[] };
-      if (response && typeof response === 'object' && 'data' in response) {
-        setChallenges(Array.isArray(response.data) ? response.data : []);
-      } else if (Array.isArray(response)) {
-        setChallenges(response);
-      } else {
-        setChallenges([]);
-      }
+      const data = await api.getChallenges();
+      setChallenges(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
       setChallenges([]);
@@ -91,29 +74,21 @@ export function useChallenges() {
 
   useEffect(() => {
     fetchChallenges();
-  }, [token]);
+  }, []);
 
   return { challenges, loading, error, refetch: fetchChallenges };
 }
 
 export function usePrograms() {
-  const { token } = useAuth();
   const [programs, setPrograms] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPrograms = async () => {
-    if (!token) return;
     try {
       setLoading(true);
-      const response = await api.getPrograms(token) as { success?: boolean; data?: unknown[] };
-      if (response && typeof response === 'object' && 'data' in response) {
-        setPrograms(Array.isArray(response.data) ? response.data : []);
-      } else if (Array.isArray(response)) {
-        setPrograms(response);
-      } else {
-        setPrograms([]);
-      }
+      const data = await api.getPrograms();
+      setPrograms(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
       setPrograms([]);
@@ -124,29 +99,21 @@ export function usePrograms() {
 
   useEffect(() => {
     fetchPrograms();
-  }, [token]);
+  }, []);
 
   return { programs, loading, error, refetch: fetchPrograms };
 }
 
 export function useWorkouts() {
-  const { token } = useAuth();
   const [workouts, setWorkouts] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchWorkouts = async () => {
-    if (!token) return;
     try {
       setLoading(true);
-      const response = await api.getWorkouts(token) as { success?: boolean; data?: unknown[] };
-      if (response && typeof response === 'object' && 'data' in response) {
-        setWorkouts(Array.isArray(response.data) ? response.data : []);
-      } else if (Array.isArray(response)) {
-        setWorkouts(response);
-      } else {
-        setWorkouts([]);
-      }
+      const data = await api.getWorkouts();
+      setWorkouts(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
       setWorkouts([]);
@@ -157,13 +124,12 @@ export function useWorkouts() {
 
   useEffect(() => {
     fetchWorkouts();
-  }, [token]);
+  }, []);
 
   return { workouts, loading, error, refetch: fetchWorkouts };
 }
 
 export function useLeaderboard(period = "weekly") {
-  const { token } = useAuth();
   const [leaderboard, setLeaderboard] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,14 +137,8 @@ export function useLeaderboard(period = "weekly") {
   const fetchLeaderboard = async () => {
     try {
       setLoading(true);
-      const response = await api.getLeaderboard(period, 10, token || undefined) as { success?: boolean; data?: unknown[] };
-      if (response && typeof response === 'object' && 'data' in response) {
-        setLeaderboard(Array.isArray(response.data) ? response.data : []);
-      } else if (Array.isArray(response)) {
-        setLeaderboard(response);
-      } else {
-        setLeaderboard([]);
-      }
+      const data = await api.getLeaderboard(period, 10);
+      setLeaderboard(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");
       setLeaderboard([]);
@@ -189,7 +149,7 @@ export function useLeaderboard(period = "weekly") {
 
   useEffect(() => {
     fetchLeaderboard();
-  }, [period, token]);
+  }, [period]);
 
   return { leaderboard, loading, error, refetch: fetchLeaderboard };
 }

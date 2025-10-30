@@ -2,22 +2,20 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import ProgramForm from "@/components/ProgramForm";
-import { usePrograms, useAuth } from "@/hooks/useAPI";
+import { usePrograms } from "@/hooks/useAPI";
 import { api } from "@/lib/api";
 
 export default function ProgramsPage() {
   const { programs, loading, refetch } = usePrograms();
-  const { token } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
 
   const handleSubmit = async (formData: any) => {
-    if (!token) return;
     try {
       if (editing) {
-        await api.updateProgram(editing.id, formData, token);
+        await api.updateProgram(editing.id, formData);
       } else {
-        await api.createProgram(formData, token);
+        await api.createProgram(formData);
       }
       setShowModal(false);
       setEditing(null);
@@ -28,9 +26,9 @@ export default function ProgramsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token || !confirm("Supprimer ce programme ?")) return;
+    if (!confirm("Supprimer ce programme ?")) return;
     try {
-      await api.deleteProgram(id, token);
+      await api.deleteProgram(id);
       refetch();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Erreur");

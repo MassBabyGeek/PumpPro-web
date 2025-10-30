@@ -2,22 +2,20 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import ChallengeForm from "@/components/ChallengeForm";
-import { useChallenges, useAuth } from "@/hooks/useAPI";
+import { useChallenges } from "@/hooks/useAPI";
 import { api } from "@/lib/api";
 
 export default function ChallengesPage() {
   const { challenges, loading, refetch } = useChallenges();
-  const { token } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
 
   const handleSubmit = async (formData: any) => {
-    if (!token) return;
     try {
       if (editing) {
-        await api.updateChallenge(editing.id, formData, token);
+        await api.updateChallenge(editing.id, formData);
       } else {
-        await api.createChallenge(formData, token);
+        await api.createChallenge(formData);
       }
       setShowModal(false);
       setEditing(null);
@@ -28,9 +26,9 @@ export default function ChallengesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token || !confirm("Supprimer ce challenge ?")) return;
+    if (!confirm("Supprimer ce challenge ?")) return;
     try {
-      await api.deleteChallenge(id, token);
+      await api.deleteChallenge(id);
       refetch();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Erreur");

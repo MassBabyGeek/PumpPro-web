@@ -4,12 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useUsers, useAuth } from "@/hooks/useAPI";
+import { useUsers } from "@/hooks/useAPI";
 import { api } from "@/lib/api";
 
 export default function UsersPage() {
   const { users, loading, refetch } = useUsers();
-  const { token } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<Record<string, string> | null>(null);
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
@@ -29,14 +28,13 @@ export default function UsersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
 
     setSubmitting(true);
     try {
       if (editingUser) {
-        await api.updateUser(editingUser.id, formData, token);
+        await api.updateUser(editingUser.id, formData);
       } else {
-        await api.createUser(formData, token);
+        await api.createUser(formData);
       }
       setShowModal(false);
       refetch();
@@ -48,10 +46,10 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token || !confirm("Supprimer cet utilisateur ?")) return;
+    if (!confirm("Supprimer cet utilisateur ?")) return;
 
     try {
-      await api.deleteUser(id, token);
+      await api.deleteUser(id);
       refetch();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Erreur");

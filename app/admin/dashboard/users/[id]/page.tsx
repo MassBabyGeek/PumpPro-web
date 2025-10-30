@@ -4,13 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useAuth } from "@/hooks/useAPI";
 import { api } from "@/lib/api";
 
 export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
-  const { token } = useAuth();
   const userId = params.id as string;
 
   const [user, setUser] = useState<any>(null);
@@ -21,22 +19,21 @@ export default function UserProfilePage() {
   const [period, setPeriod] = useState("weekly");
 
   useEffect(() => {
-    if (!token || !userId) return;
+    if (!userId) return;
 
     const fetchUserData = async () => {
       setLoading(true);
       try {
          const results = await Promise.allSettled([
-          api.getUser(userId, token),
-          api.getUserStats(userId, period, token),
-          api.getUserWorkouts(userId, token),
-          api.getUserChallenges(userId, token),
+          api.getUser(userId),
+          api.getUserStats(userId, period),
+          api.getUserWorkouts(userId),
+          api.getUserChallenges(userId),
         ]);
         const [userRes, statsRes, workoutsRes, challengesRes] = results;
 
         if (userRes.status === "fulfilled") {
-          const data = (userRes.value as any)?.data ?? userRes.value;
-          setUser(data);
+          setUser(userRes.value);
         } else {
           console.error("Erreur utilisateur:", userRes.reason);
           alert("⚠️ Impossible de charger les informations utilisateur");
@@ -44,8 +41,7 @@ export default function UserProfilePage() {
 
         // 🔹 STATS
         if (statsRes.status === "fulfilled") {
-          const data = (statsRes.value as any)?.data ?? statsRes.value;
-          setStats(data);
+          setStats(statsRes.value);
         } else {
           console.error("Erreur stats:", statsRes.reason);
           alert("⚠️ Impossible de charger les statistiques");
@@ -53,7 +49,7 @@ export default function UserProfilePage() {
 
         // 🔹 WORKOUTS
         if (workoutsRes.status === "fulfilled") {
-          const data = (workoutsRes.value as any)?.data ?? workoutsRes.value;
+          const data = workoutsRes.value;
           setWorkouts(Array.isArray(data) ? data : []);
         } else {
           console.error("Erreur workouts:", workoutsRes.reason);
@@ -62,7 +58,7 @@ export default function UserProfilePage() {
 
         // 🔹 CHALLENGES
         if (challengesRes.status === "fulfilled") {
-          const data = (challengesRes.value as any)?.data ?? challengesRes.value;
+          const data = challengesRes.value;
           setChallenges(Array.isArray(data) ? data : []);
         } else {
           console.error("Erreur challenges:", challengesRes.reason);
@@ -77,13 +73,13 @@ export default function UserProfilePage() {
     };
 
     fetchUserData();
-  }, [userId, token, period]);
+  }, [userId, period]);
 
   const handleDelete = async () => {
-    if (!token || !confirm("Supprimer définitivement cet utilisateur ?")) return;
+    if (!confirm("Supprimer définitivement cet utilisateur ?")) return;
 
     try {
-      await api.deleteUser(userId, token);
+      await api.deleteUser(userId);
       alert("Utilisateur supprimé");
       router.push("/admin/dashboard/users");
     } catch (error) {

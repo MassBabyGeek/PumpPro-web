@@ -3,17 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
-import { useWorkouts, useAuth } from "@/hooks/useAPI";
+import { useWorkouts } from "@/hooks/useAPI";
 import { api } from "@/lib/api";
 
 export default function WorkoutsPage() {
   const { workouts, loading, refetch } = useWorkouts();
-  const { token } = useAuth();
 
   const handleDelete = async (id: string) => {
-    if (!token || !confirm("Supprimer ce workout ?")) return;
+    if (!confirm("Supprimer ce workout ?")) return;
     try {
-      await api.deleteWorkout(id, token);
+      await api.deleteWorkout(id);
       refetch();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Erreur");
