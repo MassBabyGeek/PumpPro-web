@@ -98,7 +98,11 @@ export default function AdminDashboard() {
                 <p className="text-[#B0B3B8] text-xs">Chargement...</p>
               ) : Array.isArray(users) && users.length > 0 ? (
                 (users as Array<Record<string, string>>).slice(0, 5).map((user, index: number) => (
-                  <div key={index} className="flex items-center gap-3 p-2 bg-[#1B1F3B]/50 rounded-lg">
+                  <Link
+                    key={index}
+                    href={`/admin/dashboard/users/${user.id}`}
+                    className="flex items-center gap-3 p-2 bg-[#1B1F3B]/50 rounded-lg hover:bg-[#1B1F3B] transition-colors cursor-pointer"
+                  >
                     {user.profilePicture || user.profilePictureUrl ? (
                       <Image src={String(user.profilePicture || user.profilePictureUrl)} alt={String(user.name || user.email)} width={32} height={32} className="w-8 h-8 rounded-full object-cover border border-white/10" />
                     ) : (
@@ -110,7 +114,7 @@ export default function AdminDashboard() {
                       <p className="text-[#F4F4F4] text-xs font-medium truncate">{String(user.name || user.email)}</p>
                       <p className="text-[#B0B3B8] text-xs truncate">{String(user.email)}</p>
                     </div>
-                  </div>
+                  </Link>
                 ))
               ) : (
                 <p className="text-[#B0B3B8] text-xs">Aucun utilisateur</p>

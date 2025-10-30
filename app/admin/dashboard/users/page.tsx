@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
 import { useUsers, useAuth } from "@/hooks/useAPI";
 import { api } from "@/lib/api";
@@ -93,21 +94,33 @@ export default function UsersPage() {
                     (users as Array<Record<string, string>>).map((user) => (
                       <tr key={user.id} className="hover:bg-[#1B1F3B]/50 transition-colors">
                         <td className="px-4 py-3">
-                          {user.profilePicture || user.profilePictureUrl ? (
-                            <Image src={String(user.profilePicture || user.profilePictureUrl)} alt={String(user.name || user.email)} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-white/10" />
-                          ) : (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-sm font-semibold">
-                              {String(user.name || "?").charAt(0).toUpperCase()}
-                            </div>
-                          )}
+                          <Link href={`/admin/dashboard/users/${user.id}`} className="block">
+                            {user.profilePicture || user.profilePictureUrl ? (
+                              <Image src={String(user.profilePicture || user.profilePictureUrl)} alt={String(user.name || user.email)} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-white/10 hover:border-[#00BFFF] transition-colors" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-sm font-semibold hover:opacity-80 transition-opacity">
+                                {String(user.name || "?").charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </Link>
                         </td>
                         <td className="px-4 py-3 text-sm text-[#B0B3B8]">{String(user.id).slice(0, 8)}...</td>
-                        <td className="px-4 py-3 text-sm text-[#F4F4F4] font-medium">{user.name}</td>
+                        <td className="px-4 py-3 text-sm text-[#F4F4F4] font-medium">
+                          <Link href={`/admin/dashboard/users/${user.id}`} className="hover:text-[#00BFFF] transition-colors">
+                            {user.name}
+                          </Link>
+                        </td>
                         <td className="px-4 py-3 text-sm text-[#B0B3B8]">{user.email}</td>
                         <td className="px-4 py-3 text-sm text-right">
+                          <Link
+                            href={`/admin/dashboard/users/${user.id}`}
+                            className="text-[#00BFFF] hover:text-[#00BFFF]/80 mr-3"
+                          >
+                            Voir
+                          </Link>
                           <button
                             onClick={() => handleEdit(user)}
-                            className="text-[#00BFFF] hover:text-[#00BFFF]/80 mr-3"
+                            className="text-[#8E2DE2] hover:text-[#8E2DE2]/80 mr-3"
                           >
                             Modifier
                           </button>

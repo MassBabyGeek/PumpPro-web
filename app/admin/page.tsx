@@ -40,6 +40,12 @@ export default function AdminLogin() {
       const data = await response.json();
 
       console.log("data:", data.data.user);
+
+      // Vérifier si l'utilisateur est admin
+      if (!data.data.user.isAdmin) {
+        throw new Error("Accès refusé. Vous devez être administrateur pour accéder à cette page.");
+      }
+
       // Stocker le token et les infos utilisateur
       localStorage.setItem("token", data.data.token);
       localStorage.setItem("refreshToken", data.data.refreshToken);
