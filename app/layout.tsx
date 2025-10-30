@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://pompeurpro.com",
+    url: "https://pumppro-backend.onrender.com",
     title: "PompeurPro - Compte tes pompes automatiquement avec l'IA",
     description: "L'application intelligente qui compte automatiquement tes pompes grâce à l'IA. Rejoins +10 000 athlètes !",
     siteName: "PompeurPro",
@@ -85,11 +85,11 @@ export default function RootLayout({
           property="og:description"
           content="Grâce à l’IA, PompeurPro compte tes pompes automatiquement et suit ta progression. Rejoins +10 000 athlètes !"
         />
-        <meta property="og:url" content="https://pompeurpro.com" />
+        <meta property="og:url" content="https://pumppro-backend.onrender.com" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="PompeurPro" />
         <meta property="og:locale" content="fr_FR" />
-        <meta property="og:image" content="https://pompeurpro.com/preview.jpg" />
+        <meta property="og:image" content="https://pumppro-backend.onrender.com/preview.jpg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
 
@@ -100,7 +100,7 @@ export default function RootLayout({
           name="twitter:description"
           content="L'app fitness qui compte tes pompes automatiquement grâce à l'IA. Rejoins +10 000 athlètes !"
         />
-        <meta name="twitter:image" content="https://pompeurpro.com/preview.jpg" />
+        <meta name="twitter:image" content="https://pumppro-backend.onrender.com/preview.jpg" />
         <meta name="twitter:creator" content="@pompeurpro" />
 
         {/* --- Favicon --- */}
@@ -114,27 +114,30 @@ export default function RootLayout({
         <SpeedInsights />
         <Analytics />
 
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "MobileApplication",
+              name: "PompeurPro",
+              operatingSystem: "iOS, Android",
+              applicationCategory: "FitnessApplication",
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.8",
+                ratingCount: "10000",
+              },
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "EUR",
+              },
+              url: "https://pumppro-backend.onrender.com",
+            }),
+          }}
+        />
 
-        <script type="application/ld+json">
-          {
-            "@context": "https://schema.org",
-            "@type": "MobileApplication",
-            "name": "PompeurPro",
-            "operatingSystem": "iOS, Android",
-            "applicationCategory": "FitnessApplication",
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.8",
-              "ratingCount": "10000"
-            },
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "EUR"
-            },
-            "url": "https://pompeurpro.com"
-          }
-          </script>
       </body>
     </html>
   );

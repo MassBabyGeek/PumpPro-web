@@ -20,11 +20,11 @@ export default function Home() {
           property="og:description"
           content="Grâce à l’IA, PompeurPro compte tes pompes automatiquement et suit ta progression. Rejoins +10 000 athlètes !"
         />
-        <meta property="og:url" content="https://pompeurpro.com" />
+        <meta property="og:url" content="https://pumppro-backend.onrender.com" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="PompeurPro" />
         <meta property="og:locale" content="fr_FR" />
-        <meta property="og:image" content="https://pompeurpro.com/preview.jpg" />
+        <meta property="og:image" content="https://pumppro-backend.onrender.com/preview.jpg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
 
@@ -35,7 +35,7 @@ export default function Home() {
           name="twitter:description"
           content="L'app fitness qui compte tes pompes automatiquement grâce à l'IA. Rejoins +10 000 athlètes !"
         />
-        <meta name="twitter:image" content="https://pompeurpro.com/preview.jpg" />
+        <meta name="twitter:image" content="https://pumppro-backend.onrender.com/preview.jpg" />
         <meta name="twitter:creator" content="@pompeurpro" />
 
         {/* --- Favicon --- */}

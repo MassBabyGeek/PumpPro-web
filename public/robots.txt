@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 
-Sitemap: https://pompeurpro.com/sitemap.xml
+Sitemap: https://pumppro-backend.onrender.com/sitemap.xml
