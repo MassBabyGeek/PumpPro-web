@@ -48,6 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: "Workouts", path: "/admin/dashboard/workouts", icon: "💪" },
     { name: "Classement", path: "/admin/dashboard/leaderboard", icon: "🥇" },
     { name: "Photos", path: "/admin/dashboard/photos", icon: "📸" },
+    { name: "Bug Reports", path: "/admin/dashboard/bug-reports", icon: "🐛" },
   ];
 
   if (!user) {

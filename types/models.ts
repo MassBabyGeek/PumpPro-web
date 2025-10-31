@@ -287,6 +287,40 @@ export interface Photo {
   createdAt: string;
 }
 
+// Bug Report types
+export interface BugReport {
+  id: string;
+  userId?: string;
+  title: string;
+  description: string;
+  category: string; // bug, crash, ui, feature-request, other
+  severity: string; // low, medium, high, critical
+  status: string; // open, in-progress, resolved, closed
+  deviceInfo?: any;
+  appVersion?: string;
+  pageUrl?: string;
+  errorStack?: string;
+  screenshotUrl?: string;
+  userEmail?: string;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt?: string;
+  resolvedBy?: string;
+  adminNotes?: string;
+}
+
+export interface BugReportStats {
+  total: number;
+  open: number;
+  inProgress: number;
+  resolved: number;
+  closed: number;
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+}
+
 // Admin-specific types
 export interface AdminActivity {
   id: string;

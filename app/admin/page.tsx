@@ -93,10 +93,6 @@ export default function AdminLogin() {
             </div>
           )}
 
-          <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/50 rounded-lg text-blue-400 text-sm">
-            ℹ️ Le serveur backend (Render gratuit) peut mettre jusqu&apos;à 60 secondes à se réveiller lors de la première connexion.
-          </div>
-
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-[#F4F4F4] font-semibold mb-2">

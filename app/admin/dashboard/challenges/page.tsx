@@ -12,16 +12,88 @@ export default function ChallengesPage() {
 
   const handleSubmit = async (formData: any) => {
     try {
+      // Helper function to clean strings from null bytes
+      const cleanString = (str: any): string | undefined => {
+        if (!str || typeof str !== 'string') return undefined;
+        const cleaned = str.replace(/\0/g, '').trim();
+        return cleaned || undefined;
+      };
+
+      // Clean up data for backend - omit empty fields instead of sending null
+      const cleanData: any = {
+        title: cleanString(formData.title) || formData.title,
+        description: cleanString(formData.description) || formData.description,
+        category: formData.category,
+        type: formData.type,
+        variant: formData.variant,
+        difficulty: formData.difficulty,
+        iconName: cleanString(formData.iconName) || formData.iconName,
+        iconColor: cleanString(formData.iconColor) || formData.iconColor,
+        points: Number(formData.points),
+        status: formData.status,
+        isOfficial: Boolean(formData.isOfficial),
+        tags: Array.isArray(formData.tags) ? formData.tags.filter((t: any) => t).map((t: any) => cleanString(t) || t) : [],
+      };
+
+      // Only add optional fields if they have values
+      if (formData.targetReps) cleanData.targetReps = Number(formData.targetReps);
+      if (formData.duration) cleanData.duration = Number(formData.duration);
+      if (formData.sets) cleanData.sets = Number(formData.sets);
+      if (formData.repsPerSet) cleanData.repsPerSet = Number(formData.repsPerSet);
+      const cleanImageUrl = cleanString(formData.imageUrl);
+      if (cleanImageUrl) cleanData.imageUrl = cleanImageUrl;
+      const cleanBadge = cleanString(formData.badge);
+      if (cleanBadge) cleanData.badge = cleanBadge;
+      if (formData.startDate) cleanData.startDate = new Date(formData.startDate).toISOString();
+      if (formData.endDate) cleanData.endDate = new Date(formData.endDate).toISOString();
+
+      // Clean challengeTasks - only include non-empty fields
+      // Don't include challengeTasks at all if empty to avoid issues
+      if (formData.challengeTasks && formData.challengeTasks.length > 0) {
+        cleanData.challengeTasks = formData.challengeTasks
+          .filter((task: any) => task && task.title) // Filter out empty tasks
+          .map((task: any) => {
+            const cleanTask: any = {
+              day: Number(task.day),
+              title: cleanString(task.title) || task.title,
+              isLocked: Boolean(task.isLocked),
+            };
+            if (task.id) cleanTask.id = task.id;
+            if (task.challengeId) cleanTask.challengeId = task.challengeId;
+            const cleanDesc = cleanString(task.description);
+            if (cleanDesc) cleanTask.description = cleanDesc;
+            const cleanType = cleanString(task.type);
+            if (cleanType) cleanTask.type = cleanType;
+            const cleanVariant = cleanString(task.variant);
+            if (cleanVariant) cleanTask.variant = cleanVariant;
+            if (task.targetReps) cleanTask.targetReps = Number(task.targetReps);
+            if (task.duration) cleanTask.duration = Number(task.duration);
+            if (task.sets) cleanTask.sets = Number(task.sets);
+            if (task.repsPerSet) cleanTask.repsPerSet = Number(task.repsPerSet);
+            if (task.scheduledDate) cleanTask.scheduledDate = new Date(task.scheduledDate).toISOString();
+            if (task.score) cleanTask.score = Number(task.score);
+            return cleanTask;
+          });
+
+        // If after filtering we have no tasks, don't include the field at all
+        if (cleanData.challengeTasks.length === 0) {
+          delete cleanData.challengeTasks;
+        }
+      }
+
+      console.log("Sending challenge data:", JSON.stringify(cleanData, null, 2));
+
       if (editing) {
-        await api.updateChallenge(editing.id, formData);
+        await api.updateChallenge(editing.id, cleanData);
       } else {
-        await api.createChallenge(formData);
+        await api.createChallenge(cleanData);
       }
       setShowModal(false);
       setEditing(null);
       refetch();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Erreur");
+      console.error("Challenge submit error:", error);
+      alert(error instanceof Error ? error.message : "Erreur lors de la soumission");
     }
   };
 

@@ -23,7 +23,7 @@ export default function AdminDashboard() {
           api.getAdminTopContent(),
         ]);
         setStats(statsData);
-        setActivity(activityData);
+        setActivity(Array.isArray(activityData) ? activityData : []);
         setTopContent(topContentData);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -210,24 +210,29 @@ export default function AdminDashboard() {
           <div className="bg-[#2C2F38] rounded-xl border border-white/10 p-4">
             <h3 className="text-sm font-bold text-[#F4F4F4] mb-3">Activité Récente</h3>
             <div className="space-y-2 max-h-80 overflow-y-auto">
-              {activity.length > 0 ? (
-                activity.map((item, index) => (
-                  <div key={index} className="flex items-start gap-3 p-2 bg-[#1B1F3B]/50 rounded-lg">
-                    {item.userAvatar ? (
-                      <Image src={item.userAvatar} alt={item.userName} width={32} height={32} className="w-8 h-8 rounded-full object-cover border border-white/10" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                        {item.userName.charAt(0).toUpperCase()}
+              {Array.isArray(activity) && activity.length > 0 ? (
+                activity.map((item, index) => {
+                  const imageUrl = item.userAvatar || "";
+                  const isValidUrl = imageUrl && !imageUrl.startsWith("file://") && (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"));
+
+                  return (
+                    <div key={index} className="flex items-start gap-3 p-2 bg-[#1B1F3B]/50 rounded-lg">
+                      {isValidUrl ? (
+                        <Image src={imageUrl} alt={item.userName} width={32} height={32} className="w-8 h-8 rounded-full object-cover border border-white/10" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                          {item.userName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[#F4F4F4] text-xs font-medium">
+                          <span className="font-semibold">{item.userName}</span> {item.details}
+                        </p>
+                        <p className="text-[#B0B3B8] text-xs">{new Date(item.timestamp).toLocaleString('fr-FR')}</p>
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[#F4F4F4] text-xs font-medium">
-                        <span className="font-semibold">{item.userName}</span> {item.details}
-                      </p>
-                      <p className="text-[#B0B3B8] text-xs">{new Date(item.timestamp).toLocaleString('fr-FR')}</p>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="text-[#B0B3B8] text-xs">Aucune activité récente</p>
               )}
@@ -289,30 +294,35 @@ export default function AdminDashboard() {
             <h3 className="text-sm font-bold text-[#F4F4F4] mb-3">Top Utilisateurs</h3>
             <div className="space-y-2">
               {topContent?.topUsers && topContent.topUsers.length > 0 ? (
-                topContent.topUsers.slice(0, 5).map((user, index) => (
-                  <Link
-                    key={user.id}
-                    href={`/admin/dashboard/users/${user.id}`}
-                    className="flex items-center gap-3 p-2 bg-[#1B1F3B]/50 rounded-lg hover:bg-[#1B1F3B] transition-colors cursor-pointer"
-                  >
-                    <span className="text-[#B0B3B8] text-xs w-6">#{index + 1}</span>
-                    {user.avatar ? (
-                      <Image src={user.avatar} alt={user.name} width={32} height={32} className="w-8 h-8 rounded-full object-cover border border-white/10" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-xs font-semibold">
-                        {user.name.charAt(0).toUpperCase()}
+                topContent.topUsers.slice(0, 5).map((user, index) => {
+                  const imageUrl = user.avatar || "";
+                  const isValidUrl = imageUrl && !imageUrl.startsWith("file://") && (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"));
+
+                  return (
+                    <Link
+                      key={user.id}
+                      href={`/admin/dashboard/users/${user.id}`}
+                      className="flex items-center gap-3 p-2 bg-[#1B1F3B]/50 rounded-lg hover:bg-[#1B1F3B] transition-colors cursor-pointer"
+                    >
+                      <span className="text-[#B0B3B8] text-xs w-6">#{index + 1}</span>
+                      {isValidUrl ? (
+                        <Image src={imageUrl} alt={user.name} width={32} height={32} className="w-8 h-8 rounded-full object-cover border border-white/10" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-xs font-semibold">
+                          {user.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[#F4F4F4] text-xs font-medium truncate">{user.name}</p>
+                        <div className="flex gap-2 text-xs text-[#B0B3B8]">
+                          <span>💪 {user.totalWorkouts}</span>
+                          <span>🔥 {user.totalPushups}</span>
+                          <span>⭐ {user.score}</span>
+                        </div>
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[#F4F4F4] text-xs font-medium truncate">{user.name}</p>
-                      <div className="flex gap-2 text-xs text-[#B0B3B8]">
-                        <span>💪 {user.totalWorkouts}</span>
-                        <span>🔥 {user.totalPushups}</span>
-                        <span>⭐ {user.score}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))
+                    </Link>
+                  );
+                })
               ) : (
                 <p className="text-[#B0B3B8] text-xs">Aucun utilisateur</p>
               )}

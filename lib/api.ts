@@ -16,6 +16,8 @@ import type {
   PaginationParams,
   PaginatedResponse,
   AdminUserListItem,
+  BugReport,
+  BugReportStats,
 } from "@/types/models";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://pumppro-backend.onrender.com";
@@ -142,14 +144,14 @@ class ApiService {
   }
 
   async updateUser(userId: string, data: Partial<UserProfile>): Promise<UserProfile> {
-    return this.request<UserProfile>(`/users/${userId}`, {
+    return this.request<UserProfile>(`/admin/users/${userId}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
   async deleteUser(userId: string): Promise<{ success: boolean }> {
-    return this.request<{ success: boolean }>(`/users/${userId}`, {
+    return this.request<{ success: boolean }>(`/admin/users/${userId}`, {
       method: "DELETE",
     });
   }
@@ -345,6 +347,44 @@ class ApiService {
   async deleteAdminUser(userId: string): Promise<{ success: boolean; message: string }> {
     return this.request<{ success: boolean; message: string }>(`/admin/users/${userId}`, {
       method: "DELETE",
+    });
+  }
+
+  // Bug Reports (Admin routes)
+  async getAdminBugReports(params?: {
+    status?: string;
+    category?: string;
+    severity?: string;
+    search?: string;
+    sort?: string;
+    order?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<BugReport[]> {
+    const queryParams = new URLSearchParams();
+    if (params?.status) queryParams.append("status", params.status);
+    if (params?.category) queryParams.append("category", params.category);
+    if (params?.severity) queryParams.append("severity", params.severity);
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.sort) queryParams.append("sort", params.sort);
+    if (params?.order) queryParams.append("order", params.order);
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.offset) queryParams.append("offset", params.offset.toString());
+    const query = queryParams.toString();
+    return this.request<BugReport[]>(`/admin/bug-reports${query ? `?${query}` : ""}`);
+  }
+
+  async resolveBugReport(reportId: string, adminNotes?: string): Promise<BugReport> {
+    return this.request<BugReport>(`/admin/bug-reports/${reportId}/resolve`, {
+      method: "POST",
+      body: JSON.stringify({ adminNotes: adminNotes || "" }),
+    });
+  }
+
+  async assignBugReport(reportId: string, adminId: string, notes?: string): Promise<BugReport> {
+    return this.request<BugReport>(`/admin/bug-reports/${reportId}/assign`, {
+      method: "POST",
+      body: JSON.stringify({ adminId, notes: notes || "" }),
     });
   }
 

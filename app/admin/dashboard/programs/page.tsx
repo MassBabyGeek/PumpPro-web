@@ -12,16 +12,42 @@ export default function ProgramsPage() {
 
   const handleSubmit = async (formData: any) => {
     try {
+      // Clean up data for backend - omit empty fields instead of sending null
+      const cleanData: any = {
+        name: formData.name,
+        type: formData.type,
+        variant: formData.variant,
+        difficulty: formData.difficulty,
+        isCustom: formData.isCustom || false,
+        isFeatured: formData.isFeatured || false,
+      };
+
+      // Only add optional fields if they have values
+      if (formData.description) cleanData.description = formData.description;
+      if (formData.restBetweenSets) cleanData.restBetweenSets = Number(formData.restBetweenSets);
+      if (formData.targetReps) cleanData.targetReps = Number(formData.targetReps);
+      if (formData.timeLimit) cleanData.timeLimit = Number(formData.timeLimit);
+      if (formData.duration) cleanData.duration = Number(formData.duration);
+      if (formData.allowRest !== undefined) cleanData.allowRest = formData.allowRest;
+      if (formData.sets) cleanData.sets = Number(formData.sets);
+      if (formData.repsPerSet) cleanData.repsPerSet = Number(formData.repsPerSet);
+      if (formData.repsSequence && Array.isArray(formData.repsSequence)) {
+        cleanData.repsSequence = formData.repsSequence.map((r: any) => Number(r));
+      }
+      if (formData.repsPerMinute) cleanData.repsPerMinute = Number(formData.repsPerMinute);
+      if (formData.totalMinutes) cleanData.totalMinutes = Number(formData.totalMinutes);
+
       if (editing) {
-        await api.updateProgram(editing.id, formData);
+        await api.updateProgram(editing.id, cleanData);
       } else {
-        await api.createProgram(formData);
+        await api.createProgram(cleanData);
       }
       setShowModal(false);
       setEditing(null);
       refetch();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Erreur");
+      console.error("Program submit error:", error);
+      alert(error instanceof Error ? error.message : "Erreur lors de la soumission");
     }
   };
 

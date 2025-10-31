@@ -93,13 +93,18 @@ export default function UsersPage() {
                       <tr key={user.id} className="hover:bg-[#1B1F3B]/50 transition-colors">
                         <td className="px-4 py-3">
                           <Link href={`/admin/dashboard/users/${user.id}`} className="block">
-                            {user.profilePicture || user.profilePictureUrl || user.avatar ? (
-                              <Image src={String(user.profilePicture || user.profilePictureUrl || user.avatar)} alt={String(user.name || user.email)} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-white/10 hover:border-[#00BFFF] transition-colors" />
-                            ) : (
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-sm font-semibold hover:opacity-80 transition-opacity">
-                                {String(user.name || "?").charAt(0).toUpperCase()}
-                              </div>
-                            )}
+                            {(() => {
+                              const imageUrl = String(user.profilePicture || user.profilePictureUrl || user.avatar || "");
+                              const isValidUrl = imageUrl && !imageUrl.startsWith("file://") && (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"));
+
+                              return isValidUrl ? (
+                                <Image src={imageUrl} alt={String(user.name || user.email)} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-white/10 hover:border-[#00BFFF] transition-colors" />
+                              ) : (
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#00BFFF] to-[#8E2DE2] flex items-center justify-center text-white text-sm font-semibold hover:opacity-80 transition-opacity">
+                                  {String(user.name || "?").charAt(0).toUpperCase()}
+                                </div>
+                              );
+                            })()}
                           </Link>
                         </td>
                         <td className="px-4 py-3 text-sm text-[#B0B3B8]">{String(user.id).slice(0, 8)}...</td>
