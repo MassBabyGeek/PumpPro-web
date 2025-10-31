@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import DashboardLayout from "@/components/DashboardLayout";
 import { api } from "@/lib/api";
 import type { BugReport } from "@/types/models";
@@ -154,12 +155,37 @@ export default function BugReportsPage() {
                   className="bg-[#2C2F38] rounded-xl p-4 border border-white/10 hover:border-[#00BFFF]/50 transition-all cursor-pointer"
                   onClick={() => setSelectedReport(report)}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
+                  <div className="flex items-start gap-4 mb-3">
+                    {/* User Avatar */}
+                    {report.userAvatar && (
+                      <div className="flex-shrink-0">
+                        <Image
+                          src={report.userAvatar}
+                          alt={report.userName || 'User'}
+                          width={48}
+                          height={48}
+                          className="w-12 h-12 rounded-full object-cover"
+                          unoptimized
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex-1 min-w-0">
+                      {/* User Info */}
+                      {report.userName && (
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[#00BFFF] font-semibold text-sm">{report.userName}</span>
+                          {report.userId && (
+                            <span className="text-[#B0B3B8] text-xs">ID: {report.userId.slice(0, 8)}...</span>
+                          )}
+                        </div>
+                      )}
+
                       <h3 className="text-[#F4F4F4] font-semibold mb-1">{report.title}</h3>
                       <p className="text-[#B0B3B8] text-sm line-clamp-2">{report.description}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-2 ml-4">
+
+                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${getSeverityColor(report.severity)}`}>
                         {report.severity}
                       </span>
@@ -186,12 +212,12 @@ export default function BugReportsPage() {
         {/* Detail Modal */}
         {selectedReport && (
           <div className="fixed inset-0 bg-black/80 flex items-start justify-center z-50 overflow-y-auto p-4">
-            <div className="bg-[#2C2F38] rounded-xl border border-white/10 w-full max-w-3xl my-8">
+            <div className="bg-[#2C2F38] rounded-xl border border-white/10 w-full max-w-4xl my-8">
               <div className="p-6">
                 <div className="flex items-start justify-between mb-6">
-                  <div>
+                  <div className="flex-1">
                     <h2 className="text-2xl font-bold text-[#F4F4F4] mb-2">{selectedReport.title}</h2>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mb-4">
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${getSeverityColor(selectedReport.severity)}`}>
                         {selectedReport.severity}
                       </span>
@@ -202,10 +228,44 @@ export default function BugReportsPage() {
                         {selectedReport.category}
                       </span>
                     </div>
+
+                    {/* User Info Card */}
+                    {(selectedReport.userName || selectedReport.userId) && (
+                      <div className="bg-[#1B1F3B] rounded-lg p-4 border border-white/5">
+                        <h3 className="text-sm font-semibold text-[#F4F4F4] mb-3">Utilisateur</h3>
+                        <div className="flex items-center gap-3">
+                          {selectedReport.userAvatar && (
+                            <Image
+                              src={selectedReport.userAvatar}
+                              alt={selectedReport.userName || 'User'}
+                              width={64}
+                              height={64}
+                              className="w-16 h-16 rounded-full object-cover"
+                              unoptimized
+                            />
+                          )}
+                          <div className="flex-1">
+                            {selectedReport.userName && (
+                              <p className="text-[#00BFFF] font-semibold text-base mb-1">{selectedReport.userName}</p>
+                            )}
+                            {selectedReport.userId && (
+                              <p className="text-[#B0B3B8] text-sm mb-1">
+                                <span className="font-medium">ID:</span> {selectedReport.userId}
+                              </p>
+                            )}
+                            {selectedReport.userEmail && (
+                              <p className="text-[#B0B3B8] text-sm">
+                                <span className="font-medium">Email:</span> {selectedReport.userEmail}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={() => setSelectedReport(null)}
-                    className="text-[#B0B3B8] hover:text-[#F4F4F4] text-2xl"
+                    className="text-[#B0B3B8] hover:text-[#F4F4F4] text-2xl ml-4"
                   >
                     ×
                   </button>
@@ -214,51 +274,65 @@ export default function BugReportsPage() {
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-sm font-semibold text-[#F4F4F4] mb-2">Description</h3>
-                    <p className="text-[#B0B3B8] text-sm whitespace-pre-wrap">{selectedReport.description}</p>
+                    <div className="bg-[#1B1F3B] rounded-lg p-4 border border-white/5">
+                      <p className="text-[#B0B3B8] text-sm whitespace-pre-wrap">{selectedReport.description}</p>
+                    </div>
                   </div>
 
-                  {selectedReport.errorStack && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-[#F4F4F4] mb-2">Error Stack</h3>
-                      <pre className="text-[#B0B3B8] text-xs bg-[#1B1F3B] p-3 rounded overflow-x-auto">
-                        {selectedReport.errorStack}
-                      </pre>
+                  {/* Metadata Grid */}
+                  <div className="bg-[#1B1F3B] rounded-lg p-4 border border-white/5">
+                    <h3 className="text-sm font-semibold text-[#F4F4F4] mb-3">Informations</h3>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-[#B0B3B8] block mb-1">ID du rapport:</span>
+                        <span className="text-[#F4F4F4] font-mono text-xs">{selectedReport.id}</span>
+                      </div>
+                      {selectedReport.appVersion && (
+                        <div>
+                          <span className="text-[#B0B3B8] block mb-1">Version app:</span>
+                          <span className="text-[#F4F4F4]">{selectedReport.appVersion}</span>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-[#B0B3B8] block mb-1">Créé le:</span>
+                        <span className="text-[#F4F4F4]">{new Date(selectedReport.createdAt).toLocaleString('fr-FR')}</span>
+                      </div>
+                      <div>
+                        <span className="text-[#B0B3B8] block mb-1">Modifié le:</span>
+                        <span className="text-[#F4F4F4]">{new Date(selectedReport.updatedAt).toLocaleString('fr-FR')}</span>
+                      </div>
+                      {selectedReport.pageUrl && (
+                        <div className="col-span-2">
+                          <span className="text-[#B0B3B8] block mb-1">Page URL:</span>
+                          <span className="text-[#F4F4F4] font-mono text-xs break-all">{selectedReport.pageUrl}</span>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
 
                   {selectedReport.deviceInfo && (
                     <div>
                       <h3 className="text-sm font-semibold text-[#F4F4F4] mb-2">Device Info</h3>
-                      <pre className="text-[#B0B3B8] text-xs bg-[#1B1F3B] p-3 rounded overflow-x-auto">
-                        {JSON.stringify(selectedReport.deviceInfo, null, 2)}
-                      </pre>
+                      <div className="bg-[#1B1F3B] rounded-lg p-4 border border-white/5">
+                        <pre className="text-[#B0B3B8] text-xs overflow-x-auto">
+                          {typeof selectedReport.deviceInfo === 'string'
+                            ? JSON.stringify(JSON.parse(selectedReport.deviceInfo), null, 2)
+                            : JSON.stringify(selectedReport.deviceInfo, null, 2)}
+                        </pre>
+                      </div>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    {selectedReport.userEmail && (
-                      <div>
-                        <span className="text-[#B0B3B8]">Email:</span>
-                        <span className="text-[#F4F4F4] ml-2">{selectedReport.userEmail}</span>
-                      </div>
-                    )}
-                    {selectedReport.appVersion && (
-                      <div>
-                        <span className="text-[#B0B3B8]">Version:</span>
-                        <span className="text-[#F4F4F4] ml-2">{selectedReport.appVersion}</span>
-                      </div>
-                    )}
-                    {selectedReport.pageUrl && (
-                      <div>
-                        <span className="text-[#B0B3B8]">Page URL:</span>
-                        <span className="text-[#F4F4F4] ml-2 text-xs">{selectedReport.pageUrl}</span>
-                      </div>
-                    )}
+                  {selectedReport.errorStack && (
                     <div>
-                      <span className="text-[#B0B3B8]">Created:</span>
-                      <span className="text-[#F4F4F4] ml-2">{new Date(selectedReport.createdAt).toLocaleString('fr-FR')}</span>
+                      <h3 className="text-sm font-semibold text-[#F4F4F4] mb-2">Error Stack</h3>
+                      <div className="bg-[#1B1F3B] rounded-lg p-4 border border-white/5">
+                        <pre className="text-red-400 text-xs overflow-x-auto whitespace-pre-wrap">
+                          {selectedReport.errorStack}
+                        </pre>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {selectedReport.adminNotes && (
                     <div>

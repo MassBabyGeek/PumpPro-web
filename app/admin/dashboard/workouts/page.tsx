@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -9,6 +10,38 @@ import { UserCreator, WorkoutSession } from "@/types/models";
 
 export default function WorkoutsPage() {
   const { workouts, loading, refetch } = useWorkouts();
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"date" | "reps" | "duration">("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [completedFilter, setCompletedFilter] = useState<"all" | "true" | "false">("all");
+
+  // Filter and sort workouts
+  const filteredWorkouts = Array.isArray(workouts) ? (workouts as Array<WorkoutSession>).filter((workout) => {
+    const user = workout.user as unknown as UserCreator;
+    const matchesSearch = searchQuery === "" ||
+      user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      workout.sessionId?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCompleted = completedFilter === "all" ||
+      (completedFilter === "true" && workout.completed) ||
+      (completedFilter === "false" && !workout.completed);
+
+    return matchesSearch && matchesCompleted;
+  }).sort((a, b) => {
+    let comparison = 0;
+
+    if (sortBy === "reps") {
+      comparison = (a.totalReps || 0) - (b.totalReps || 0);
+    } else if (sortBy === "duration") {
+      comparison = (a.totalDuration || 0) - (b.totalDuration || 0);
+    } else if (sortBy === "date") {
+      comparison = new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+    }
+
+    return sortOrder === "asc" ? comparison : -comparison;
+  }) : [];
 
   const handleDelete = async (id: string) => {
     if (!confirm("Supprimer ce workout ?")) return;
@@ -28,6 +61,77 @@ export default function WorkoutsPage() {
           <p className="text-[#B0B3B8] text-sm">Toutes les sessions d entraînement</p>
         </div>
 
+        {/* Filters */}
+        <div className="bg-[#2C2F38] rounded-xl p-4 border border-white/10 mb-6">
+          <div className="grid md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#F4F4F4] mb-2">Recherche</label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Nom utilisateur ou ID..."
+                className="w-full px-3 py-2 bg-[#1B1F3B] border border-white/10 rounded-lg text-[#F4F4F4] focus:border-[#00BFFF] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#F4F4F4] mb-2">Complété</label>
+              <select
+                value={completedFilter}
+                onChange={(e) => setCompletedFilter(e.target.value as "all" | "true" | "false")}
+                className="w-full px-3 py-2 bg-[#1B1F3B] border border-white/10 rounded-lg text-[#F4F4F4] focus:border-[#00BFFF] focus:outline-none"
+              >
+                <option value="all">Tous</option>
+                <option value="true">Oui</option>
+                <option value="false">Non</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#F4F4F4] mb-2">Trier par</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as "date" | "reps" | "duration")}
+                className="w-full px-3 py-2 bg-[#1B1F3B] border border-white/10 rounded-lg text-[#F4F4F4] focus:border-[#00BFFF] focus:outline-none"
+              >
+                <option value="date">Date</option>
+                <option value="reps">Répétitions</option>
+                <option value="duration">Durée</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#F4F4F4] mb-2">Ordre</label>
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+                className="w-full px-3 py-2 bg-[#1B1F3B] border border-white/10 rounded-lg text-[#F4F4F4] focus:border-[#00BFFF] focus:outline-none"
+              >
+                <option value="desc">Décroissant</option>
+                <option value="asc">Croissant</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between text-sm">
+            <p className="text-[#B0B3B8]">
+              {filteredWorkouts.length} workout{filteredWorkouts.length > 1 ? 's' : ''} trouvé{filteredWorkouts.length > 1 ? 's' : ''}
+            </p>
+            {(searchQuery || completedFilter !== "all") && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setCompletedFilter("all");
+                }}
+                className="text-[#00BFFF] hover:text-[#00BFFF]/80"
+              >
+                Réinitialiser les filtres
+              </button>
+            )}
+          </div>
+        </div>
+
         {loading ? (
           <div className="text-[#B0B3B8] text-center py-12">Chargement...</div>
         ) : (
@@ -45,8 +149,8 @@ export default function WorkoutsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {Array.isArray(workouts) && workouts.length > 0 ? (
-                    (workouts as Array<WorkoutSession>).map((workoutSession) => {
+                  {filteredWorkouts.length > 0 ? (
+                    filteredWorkouts.map((workoutSession) => {
                       const workoutId = workoutSession.sessionId
                       const user = workoutSession.user as unknown as UserCreator;
                       const userId = user?.id;

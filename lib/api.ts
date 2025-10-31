@@ -371,7 +371,9 @@ class ApiService {
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.offset) queryParams.append("offset", params.offset.toString());
     const query = queryParams.toString();
-    return this.request<BugReport[]>(`/admin/bug-reports${query ? `?${query}` : ""}`);
+    const response = await this.request<{ reports: BugReport[]; pagination: any; filters: any }>(`/admin/bug-reports${query ? `?${query}` : ""}`);
+    // Extract reports array from nested response structure
+    return response.reports || [];
   }
 
   async resolveBugReport(reportId: string, adminNotes?: string): Promise<BugReport> {
@@ -393,19 +395,26 @@ class ApiService {
     type?: "all" | "avatar" | "challenge" | "bug_report";
     limit?: number;
     offset?: number;
-  }): Promise<PaginatedResponse<Photo>> {
+  }): Promise<Photo[]> {
     const queryParams = new URLSearchParams();
     if (params?.type) queryParams.append("type", params.type);
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.offset) queryParams.append("offset", params.offset.toString());
     const query = queryParams.toString();
-    return this.request<PaginatedResponse<Photo>>(`/admin/photos${query ? `?${query}` : ""}`);
+    const response = await this.request<{ photos: Photo[]; pagination: any }>(`/admin/photos${query ? `?${query}` : ""}`);
+    // Extract photos array from nested response structure
+    return response.photos || [];
+  }
+
+  async deleteAdminPhoto(entityId: string, type: "avatar" | "challenge" | "bug_report"): Promise<void> {
+    return this.request<void>(`/admin/photos/${entityId}?type=${type}`, {
+      method: "DELETE",
+    });
   }
 
   // Legacy Photos endpoint (for backward compatibility)
   async getPhotos(): Promise<Photo[]> {
-    const result = await this.getAdminPhotos();
-    return result.data;
+    return this.getAdminPhotos();
   }
 
   // Health

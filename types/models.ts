@@ -279,11 +279,10 @@ export interface AdminUserListItem {
 }
 
 export interface Photo {
-  id: string;
   url: string;
-  type: string;
-  userId?: string;
-  user?: UserCreator;
+  type: "avatar" | "challenge" | "bug_report" | "all";
+  entityId: string;
+  entityName: string;
   createdAt: string;
 }
 
@@ -291,6 +290,8 @@ export interface Photo {
 export interface BugReport {
   id: string;
   userId?: string;
+  userName?: string;
+  userAvatar?: string;
   title: string;
   description: string;
   category: string; // bug, crash, ui, feature-request, other

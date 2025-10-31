@@ -14,6 +14,38 @@ export default function UsersPage() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
 
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "email" | "date">("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all");
+
+  // Filter and sort users
+  const filteredUsers = Array.isArray(users) ? (users as Array<Record<string, string | boolean>>).filter((user) => {
+    const matchesSearch = searchQuery === "" ||
+      String(user.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      String(user.email || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      String(user.id || "").toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesRole = roleFilter === "all" ||
+      (roleFilter === "admin" && user.isAdmin) ||
+      (roleFilter === "user" && !user.isAdmin);
+
+    return matchesSearch && matchesRole;
+  }).sort((a, b) => {
+    let comparison = 0;
+
+    if (sortBy === "name") {
+      comparison = String(a.name || "").localeCompare(String(b.name || ""));
+    } else if (sortBy === "email") {
+      comparison = String(a.email || "").localeCompare(String(b.email || ""));
+    } else if (sortBy === "date") {
+      comparison = new Date(String(a.createdAt || 0)).getTime() - new Date(String(b.createdAt || 0)).getTime();
+    }
+
+    return sortOrder === "asc" ? comparison : -comparison;
+  }) : [];
+
   const handleCreate = () => {
     setEditingUser(null);
     setFormData({ name: "", email: "", password: "" });
@@ -32,7 +64,16 @@ export default function UsersPage() {
     setSubmitting(true);
     try {
       if (editingUser) {
-        await api.updateUser(editingUser.id, formData);
+        // Pour l'update, ne pas envoyer le password s'il est vide
+        const cleanData: { name: string; email: string; password?: string } = {
+          name: formData.name,
+          email: formData.email,
+        };
+        // Seulement ajouter le password s'il n'est pas vide
+        if (formData.password && formData.password.trim()) {
+          cleanData.password = formData.password;
+        }
+        await api.updateUser(editingUser.id, cleanData);
       } else {
         await api.createUser(formData);
       }
@@ -72,6 +113,77 @@ export default function UsersPage() {
           </button>
         </div>
 
+        {/* Filters */}
+        <div className="bg-[#2C2F38] rounded-xl p-4 border border-white/10 mb-6">
+          <div className="grid md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-[#F4F4F4] mb-2">Recherche</label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Nom, email ou ID..."
+                className="w-full px-3 py-2 bg-[#1B1F3B] border border-white/10 rounded-lg text-[#F4F4F4] focus:border-[#00BFFF] focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#F4F4F4] mb-2">Rôle</label>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value as "all" | "admin" | "user")}
+                className="w-full px-3 py-2 bg-[#1B1F3B] border border-white/10 rounded-lg text-[#F4F4F4] focus:border-[#00BFFF] focus:outline-none"
+              >
+                <option value="all">Tous</option>
+                <option value="admin">Admins</option>
+                <option value="user">Utilisateurs</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#F4F4F4] mb-2">Trier par</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as "name" | "email" | "date")}
+                className="w-full px-3 py-2 bg-[#1B1F3B] border border-white/10 rounded-lg text-[#F4F4F4] focus:border-[#00BFFF] focus:outline-none"
+              >
+                <option value="date">Date de création</option>
+                <option value="name">Nom</option>
+                <option value="email">Email</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#F4F4F4] mb-2">Ordre</label>
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+                className="w-full px-3 py-2 bg-[#1B1F3B] border border-white/10 rounded-lg text-[#F4F4F4] focus:border-[#00BFFF] focus:outline-none"
+              >
+                <option value="desc">Décroissant</option>
+                <option value="asc">Croissant</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between text-sm">
+            <p className="text-[#B0B3B8]">
+              {filteredUsers.length} utilisateur{filteredUsers.length > 1 ? 's' : ''} trouvé{filteredUsers.length > 1 ? 's' : ''}
+            </p>
+            {(searchQuery || roleFilter !== "all") && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setRoleFilter("all");
+                }}
+                className="text-[#00BFFF] hover:text-[#00BFFF]/80"
+              >
+                Réinitialiser les filtres
+              </button>
+            )}
+          </div>
+        </div>
+
         {loading ? (
           <div className="text-[#B0B3B8] text-center py-12">Chargement...</div>
         ) : (
@@ -88,9 +200,9 @@ export default function UsersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {Array.isArray(users) && users.length > 0 ? (
-                    (users as Array<Record<string, string>>).map((user) => (
-                      <tr key={user.id} className="hover:bg-[#1B1F3B]/50 transition-colors">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <tr key={String(user.id)} className="hover:bg-[#1B1F3B]/50 transition-colors">
                         <td className="px-4 py-3">
                           <Link href={`/admin/dashboard/users/${user.id}`} className="block">
                             {(() => {
@@ -122,13 +234,13 @@ export default function UsersPage() {
                             Voir
                           </Link>
                           <button
-                            onClick={() => handleEdit(user)}
+                            onClick={() => handleEdit(user as Record<string, string>)}
                             className="text-[#8E2DE2] hover:text-[#8E2DE2]/80 mr-3"
                           >
                             Modifier
                           </button>
                           <button
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => handleDelete(String(user.id))}
                             className="text-red-400 hover:text-red-400/80"
                           >
                             Supprimer
